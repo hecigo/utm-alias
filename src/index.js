@@ -103,10 +103,34 @@ export function createResolver(config) {
   const social = new Set(config.socialSources ?? SOCIAL_SOURCES)
   const testCode = config.testCode === undefined ? 'zz' : config.testCode
 
-  for (const [code, path] of Object.entries(destinations)) {
-    if (code.includes('-')) {
-      throw new Error(`utm-alias: destination code "${code}" contains "-", which separates alias segments`)
+  // Every code lands in an alias segment, and segments are split on "-" and
+  // matched against SEGMENT. A code the parser can never produce is worse than
+  // a missing one: `sources: { 'my-src': ... }` builds fine, and then
+  // `hm-my-src-post` fails with `source "my" is not in the table. Allowed:
+  // my-src` - an error naming a code that cannot be used. Caught here instead,
+  // at the one moment it is still cheap to fix.
+  for (const [label, table] of [
+    ['destination', destinations],
+    ['source', sources],
+    ['campaign', campaigns],
+    ['place', places],
+  ]) {
+    for (const code of Object.keys(table)) {
+      if (!SEGMENT.test(code)) {
+        throw new Error(
+          `utm-alias: ${label} code "${code}" cannot appear in an alias. ` +
+            'Codes may contain lowercase letters and digits only, with no "-", ' +
+            'because "-" separates alias segments.'
+        )
+      }
     }
+  }
+
+  if (testCode !== null && !SEGMENT.test(testCode)) {
+    throw new Error(`utm-alias: testCode "${testCode}" may contain lowercase letters and digits only`)
+  }
+
+  for (const [code, path] of Object.entries(destinations)) {
     if (!path.startsWith('/')) {
       throw new Error(`utm-alias: destination "${code}" must be a path starting with "/", got "${path}"`)
     }

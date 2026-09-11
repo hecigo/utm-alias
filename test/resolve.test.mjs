@@ -98,10 +98,25 @@ test('resolveUrl returns null rather than a half-built URL', () => {
 
 // --- configuration is checked at build time, not at click time ----------------
 
-test('a destination code containing a hyphen is refused when the resolver is built', () => {
-  // The alias separator is "-", so such a code would break parsing for every
-  // alias using it - at click time, on links already published.
-  assert.throws(() => createResolver({ destinations: { 'my-page': '/x/' } }), /contains "-"/)
+test('a code the parser can never produce is refused in EVERY table', () => {
+  // The alias separator is "-", so such a code breaks parsing for every alias
+  // using it - at click time, on links already published.
+  //
+  // 0.1.0 checked destinations only. A hyphenated SOURCE built fine and then
+  // failed at resolve time with `source "my" is not in the table. Allowed:
+  // my-src`, an error naming a code that cannot be used.
+  const d = { hm: '/' }
+  assert.throws(() => createResolver({ destinations: { 'my-page': '/x/' } }), /destination code/)
+  assert.throws(() => createResolver({ destinations: d, sources: { 'my-src': 'x' } }), /source code/)
+  assert.throws(() => createResolver({ destinations: d, campaigns: { 'my-camp': 'x' } }), /campaign code/)
+  assert.throws(
+    () => createResolver({ destinations: d, places: { 'my-place': { medium: 'social', content: 'x' } } }),
+    /place code/
+  )
+  assert.throws(() => createResolver({ destinations: d, testCode: 'no-pe' }), /testCode/)
+
+  // Uppercase is equally unusable: the parser only accepts lowercase.
+  assert.throws(() => createResolver({ destinations: { HM: '/' } }), /destination code/)
 })
 
 test('a destination that is not a path is refused', () => {
