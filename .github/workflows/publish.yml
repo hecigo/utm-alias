@@ -1,0 +1,35 @@
+name: Publish to npm
+
+# Trusted Publishing (OIDC). Khong co token npm nao trong repo nay.
+#
+# npm khoa cau hinh theo dung bo ba owner / repo / TEN FILE WORKFLOW. Doi ten
+# file nay, hoac doi ten repo, se lam publish that bai cho toi khi khai bao lai
+# ben npm. Xem ADR-005 trong hecigo-business-skills.
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+
+      # Trusted publishing doi npm >= 11.5.1, con Node 22 chi kem npm 10.x.
+      - name: Nang npm
+        run: npm install -g npm@latest
+
+      - name: Test
+        run: npm test
+
+      # KHONG truyen --provenance: no duoc sinh tu dong khi publish tu trusted
+      # publisher, va truyen tay se xung dot.
+      - name: Publish
+        run: npm publish --access public

@@ -1,0 +1,22 @@
+{
+  "name": "@hecigolab/utm-alias",
+  "version": "0.1.0",
+  "description": "Turn short link aliases into URLs whose utm_medium GA4 can actually group. Zero dependencies, runs on Workers, Node and the browser.",
+  "keywords": ["utm", "ga4", "analytics", "channel-grouping", "short-link", "attribution", "cloudflare-workers"],
+  "license": "MIT",
+  "author": "hecigo <hi@hecigo.com>",
+  "homepage": "https://hecigo.com/blog/bay-cho-hong-khong-keu-khi-tu-dung-lop-gan-tham-so-cho-link/",
+  "repository": { "type": "git", "url": "https://github.com/hecigo/utm-alias.git" },
+  "bugs": { "url": "https://github.com/hecigo/utm-alias/issues" },
+  "type": "module",
+  "exports": { ".": { "types": "./src/index.d.ts", "default": "./src/index.js" } },
+  "main": "./src/index.js",
+  "types": "./src/index.d.ts",
+  "files": ["src", "README.md", "LICENSE", "CHANGELOG.md"],
+  "engines": { "node": ">=18" },
+  "sideEffects": false,
+  "scripts": {
+    "test": "node --test \"test/*.test.mjs\""
+  },
+  "publishConfig": { "access": "public" }
+}

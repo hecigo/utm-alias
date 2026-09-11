@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Test
+        run: npm test
+
+      # The package ships source, not a build. A missing file in `files` is
+      # invisible locally and breaks every install, so check what would actually
+      # be published rather than what is on disk.
+      - name: Kiem noi dung goi se publish
+        run: |
+          npm pack --dry-run --json > /tmp/pack.json
+          node -e "
+            const f = require('/tmp/pack.json')[0].files.map(x => x.path)
+            const must = ['src/index.js', 'src/index.d.ts', 'README.md', 'LICENSE']
+            const missing = must.filter(m => !f.includes(m))
+            if (missing.length) { console.error('thieu trong goi:', missing.join(', ')); process.exit(1) }
+            console.log('goi co', f.length, 'file:', f.join(' '))
+          "
