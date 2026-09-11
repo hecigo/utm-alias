@@ -1,8 +1,11 @@
 # Changelog
 
-## 0.1.1
+## 0.1.2
 
 Configuration codes are now checked in every table, not only destinations.
+
+(0.1.1 was tagged locally during the first release and never published, so the
+registry goes 0.1.0 -> 0.1.2.)
 
 A code containing `-`, or an uppercase one, can never appear in an alias: the
 parser splits on `-` and matches lowercase segments. In 0.1.0 only destination
